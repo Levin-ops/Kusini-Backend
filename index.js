@@ -147,7 +147,7 @@ app.get("/allproducts", async (req, res) => {
 app.get("/topshelf", async (req, res) => {
   let products = await Product.find({ level: "Top Shelf" });
   let topShelf = products.slice(1).slice(-12);
-  res.send(products);
+  res.send(topShelf);
 });
 
 //Endpoint for Popular Drinks
@@ -155,6 +155,12 @@ app.get("/populardrinks", async (req, res) => {
   let products = await Product.find({ level: "Standard" });
   let popularDrinks = products.slice(0, 8);
   res.send(popularDrinks);
+});
+
+app.get("/softdrinks", async (req, res) => {
+  let products = await Product.find({ category: "soft_drink" });
+  let softDrinks = products.slice(0, 5);
+  res.send(softDrinks);
 });
 
 //Schema For Admin Model
