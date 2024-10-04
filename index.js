@@ -158,7 +158,7 @@ app.get("/populardrinks", async (req, res) => {
 });
 
 app.get("/softdrinks", async (req, res) => {
-  let products = await Product.find({ category: "soft_drink" });
+  let products = await Product.find({ category: "soft-drink" });
   let softDrinks = products.slice(0, 5);
   res.send(softDrinks);
 });
