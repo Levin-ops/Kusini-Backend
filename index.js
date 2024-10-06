@@ -11,6 +11,7 @@ const { error } = require("console");
 const port = 4000;
 const axios = require("axios");
 const dotenv = require("dotenv");
+const cloudinary = require("./cloudinary");
 
 dotenv.config();
 
@@ -23,33 +24,43 @@ mongoose.connect(
 );
 
 app.get("/", (req, res) => {
-  res.send("Express App is running.");
+  res.send("Kusini Backend is running.");
 });
 
-//Image Storage
-const storage = multer.diskStorage({
-  destination: "./upload/images",
-  filename: (req, file, cb) => {
-    return cb(
-      null,
-      `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`
-    );
-  },
-});
-
+// Image Storage Handling
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-//Creating Upload endpoint for images
-app.use("/images", express.static("upload/images"));
-app.post("/upload", upload.single("product"), (req, res) => {
-  res.json({
-    success: 1,
-    image_url: `http://localhost:${port}/images/${req.file.filename}`,
-  });
+// Upload endpoint for images and uploading to Cloudinary
+app.post("/upload", upload.single("product"), async (req, res) => {
+  try {
+    // Upload image to Cloudinary
+    const result = await cloudinary.uploader.upload_stream(
+      { folder: "products" },
+      (error, result) => {
+        if (error) {
+          return res
+            .status(500)
+            .json({ success: 0, message: "Cloudinary upload error", error });
+        }
+        // Return the Cloudinary URL in the response
+        res.json({
+          success: 1,
+          image_url: result.secure_url,
+        });
+      }
+    );
+    // Stream the image buffer to Cloudinary
+    const bufferStream = require("stream").Readable.from(req.file.buffer);
+    bufferStream.pipe(result);
+  } catch (error) {
+    console.error("Upload error:", error);
+    res.status(500).json({ success: 0, message: "Upload failed", error });
+  }
 });
+app.use("/images", express.static("upload/images"));
 
 //Schema for products
-
 const Product = mongoose.model("Product", {
   id: {
     type: Number,
