@@ -32,10 +32,13 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 // Upload endpoint for images and uploading to Cloudinary
-app.post("/upload", upload.single("product"), async (req, res) => {
+app.post("/upload", upload.single("product"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ success: 0, message: "No file uploaded" });
+  }
+
   try {
-    // Upload image to Cloudinary
-    const result = await cloudinary.uploader.upload_stream(
+    const stream = cloudinary.uploader.upload_stream(
       { folder: "products" },
       (error, result) => {
         if (error) {
@@ -43,6 +46,7 @@ app.post("/upload", upload.single("product"), async (req, res) => {
             .status(500)
             .json({ success: 0, message: "Cloudinary upload error", error });
         }
+
         // Return the Cloudinary URL in the response
         res.json({
           success: 1,
@@ -50,15 +54,15 @@ app.post("/upload", upload.single("product"), async (req, res) => {
         });
       }
     );
+
     // Stream the image buffer to Cloudinary
     const bufferStream = require("stream").Readable.from(req.file.buffer);
-    bufferStream.pipe(result);
+    bufferStream.pipe(stream);
   } catch (error) {
     console.error("Upload error:", error);
     res.status(500).json({ success: 0, message: "Upload failed", error });
   }
 });
-app.use("/images", express.static("upload/images"));
 
 //Schema for products
 const Product = mongoose.model("Product", {
