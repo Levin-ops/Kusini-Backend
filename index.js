@@ -451,7 +451,7 @@ app.post("/stk", getMpesaToken, async (req, res) => {
       PartyA: `254${phone}`,
       PartyB: tillNumber,
       PhoneNumber: `254${phone}`,
-      CallBackURL: "https://yourdomain.com/mpesa/callback",
+      CallBackURL: "https://kusini-backend-1.onrender.com/mpesa/callback",
       AccountReference: `Order12345`,
       TransactionDesc: "Payment for goods",
     };
@@ -477,6 +477,28 @@ app.post("/stk", getMpesaToken, async (req, res) => {
       error.response ? error.response.data : error
     );
     res.status(400).json({ error: "Failed to initiate STK Push" });
+  }
+});
+
+app.post("/mpesa/callback", async (req, res) => {
+  try {
+    const { Body } = req.body;
+    const { ResultCode, ResultDesc } = Body.stkCallback;
+
+    if (ResultCode === 0) {
+      // Success case
+      console.log("Payment successful:", Body.stkCallback);
+      // Send success response back to frontend
+      res.json({ status: "Success", message: "Payment successful" });
+    } else {
+      // Cancellation or failure case
+      console.log("Payment failed or cancelled:", ResultDesc);
+      // Send cancellation response back to frontend
+      res.json({ status: "Cancelled", message: "Payment cancelled" });
+    }
+  } catch (error) {
+    console.error("Error handling M-Pesa callback: ", error);
+    res.status(500).json({ error: "Error handling payment callback" });
   }
 });
 
