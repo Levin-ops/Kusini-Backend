@@ -161,14 +161,14 @@ app.get("/allproducts", async (req, res) => {
 //Endpoint for Top-Shelf drinks
 app.get("/topshelf", async (req, res) => {
   let products = await Product.find({ level: "Top Shelf" });
-  let topShelf = products.slice(1).slice(-12);
+  let topShelf = products.slice(0, 16);
   res.send(topShelf);
 });
 
 //Endpoint for Popular Drinks
 app.get("/populardrinks", async (req, res) => {
   let products = await Product.find({ level: "Standard" });
-  let popularDrinks = products.slice(0, 8);
+  let popularDrinks = products.slice(0, 16);
   res.send(popularDrinks);
 });
 
