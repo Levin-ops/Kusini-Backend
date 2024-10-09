@@ -1,12 +1,22 @@
 const axios = require("axios");
 const shortid = require("shortid");
 
+const formatPhoneNumber = (phone) => {
+  // Check if the phone number starts with '0' and replace with '254'
+  if (phone.startsWith("0")) {
+    return phone.replace(/^0/, "254");
+  }
+  return phone; // If it already has 254, return as is
+};
+
 const stkPush = async (req, res) => {
-  const { phone, amount } = req.body; // Phone number and amount to be charged
-  const token = req.mpesaToken; // This is passed via middleware
+  let { phone, amount } = req.body;
+  const token = req.mpesaToken;
+
+  // Format the phone number to match Mpesa requirements
+  phone = formatPhoneNumber(phone);
 
   const url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest";
-
   const auth = `Bearer ${token}`;
 
   try {
@@ -22,9 +32,9 @@ const stkPush = async (req, res) => {
         Timestamp: new Date().toISOString().replace(/-|T|:|\.\d+Z/g, ""),
         TransactionType: "CustomerBuyGoodsOnline",
         Amount: amount,
-        PartyA: phone,
+        PartyA: phone, // Use the formatted phone number
         PartyB: process.env.MPESA_BUSINESS_SHORTCODE,
-        PhoneNumber: phone,
+        PhoneNumber: phone, // Use the formatted phone number
         CallBackURL: process.env.CALLBACK_URL,
         AccountReference: shortid.generate(),
         TransactionDesc: "Payment for Order",
