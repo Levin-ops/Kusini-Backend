@@ -23,9 +23,9 @@ const stkPush = async (req, res) => {
     const response = await axios.post(
       url,
       {
-        BusinessShortCode: process.env.MPESA_BUSINESS_SHORTCODE,
+        BusinessShortCode: process.env.MPESA_SHORTCODE,
         Password: Buffer.from(
-          `${process.env.MPESA_BUSINESS_SHORTCODE}${
+          `${process.env.MPESA_SHORTCODE}${
             process.env.MPESA_PASSKEY
           }${new Date().toISOString().replace(/-|T|:|\.\d+Z/g, "")}`
         ).toString("base64"),
@@ -33,10 +33,10 @@ const stkPush = async (req, res) => {
         TransactionType: "CustomerBuyGoodsOnline",
         Amount: amount,
         PartyA: phone, // Use the formatted phone number
-        PartyB: process.env.MPESA_BUSINESS_SHORTCODE,
+        PartyB: process.env.MPESA_SHORTCODE,
         PhoneNumber: phone, // Use the formatted phone number
         CallBackURL: process.env.CALLBACK_URL,
-        AccountReference: shortid.generate(),
+        AccountReference: "Order Payment",
         TransactionDesc: "Payment for Order",
       },
       {
