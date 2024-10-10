@@ -1,5 +1,6 @@
 const Product = require("../models/Product");
 const cloudinary = require("../config/cloudinary");
+const { Readable } = require("stream");
 
 const addProduct = async (req, res) => {
   try {
