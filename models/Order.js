@@ -21,6 +21,7 @@ const OrderSchema = new mongoose.Schema({
     required: true,
   },
   shippingFee: { type: Number, required: true },
+  location: { type: String, required: true },
   totalAmount: { type: Number, required: true },
   status: {
     type: String,
