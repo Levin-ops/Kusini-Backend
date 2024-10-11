@@ -1,3 +1,4 @@
+const { type } = require("express/lib/response");
 const mongoose = require("mongoose");
 
 const OrderSchema = new mongoose.Schema({
@@ -18,6 +19,11 @@ const OrderSchema = new mongoose.Schema({
   paymentMethod: {
     type: String,
     enum: ["cod", "mpesa", "paynow"],
+    required: true,
+  },
+  paymentStatus: {
+    type: String,
+    enum: ["C.O.D", "M.O.D", "PAID"],
     required: true,
   },
   shippingFee: { type: Number, required: true },

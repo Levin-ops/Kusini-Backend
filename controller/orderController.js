@@ -1,9 +1,10 @@
 const Order = require("../models/Order");
 
 const createOrder = async (req, res) => {
-  const { customer, items, paymentMethod, shippingFee, totalAmount } = req.body;
+  const { customer, items, paymentMethod, shippingFee, totalAmount, location } =
+    req.body;
 
-  if (!customer || !items || !paymentMethod || !totalAmount) {
+  if (!customer || !items || !paymentMethod || !totalAmount || !location) {
     return res.status(400).json({ message: "All fields are required." });
   }
 
@@ -11,8 +12,10 @@ const createOrder = async (req, res) => {
     customer,
     items,
     paymentMethod,
+    paymentStatus: paymentMethod === "cod" ? "C.O.D" : "M.O.D", // Default status
     shippingFee,
     totalAmount,
+    location,
   });
 
   try {

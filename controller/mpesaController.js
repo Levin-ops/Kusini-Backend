@@ -1,5 +1,5 @@
 const axios = require("axios");
-const shortid = require("shortid");
+const Order = require("../models/Order");
 
 const formatPhoneNumber = (phone) => {
   // Check if the phone number starts with '0' and replace with '254'
@@ -69,4 +69,48 @@ const stkPush = async (req, res) => {
   }
 };
 
-module.exports = { stkPush };
+const handleMpesaCallback = async (req, res) => {
+  try {
+    const callbackData = req.body;
+    const { Body } = callbackData;
+
+    if (Body.stkCallback.ResultCode === 0) {
+      // Successful transaction
+      const transactionDetails = Body.stkCallback.CallbackMetadata.Item;
+      const phoneNumber = transactionDetails.find(
+        (item) => item.Name === "PhoneNumber"
+      ).Value;
+      const amountPaid = transactionDetails.find(
+        (item) => item.Name === "Amount"
+      ).Value;
+
+      // Find the order by phone number and update it to PAID
+      const order = await Order.findOne({
+        "customer.phoneNumber": phoneNumber,
+        paymentMethod: "mpesa",
+      });
+
+      if (order) {
+        order.paymentStatus = "PAID";
+        await order.save();
+        return res
+          .status(200)
+          .json({ success: true, message: "Payment status updated to PAID." });
+      } else {
+        return res
+          .status(404)
+          .json({ success: false, message: "Order not found." });
+      }
+    } else {
+      // Transaction failed or canceled
+      return res
+        .status(400)
+        .json({ success: false, message: "Transaction failed." });
+    }
+  } catch (error) {
+    console.error("Mpesa callback error:", error);
+    res.status(500).json({ success: false, message: "Server error." });
+  }
+};
+
+module.exports = { stkPush, handleMpesaCallback };
