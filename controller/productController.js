@@ -27,6 +27,7 @@ const addProduct = async (req, res) => {
           id: id,
           name: req.body.name,
           image: result.secure_url,
+          code: req.body.code,
           category: req.body.category,
           description: req.body.description,
           level: req.body.level,
