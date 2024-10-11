@@ -51,7 +51,15 @@ const addProduct = async (req, res) => {
 };
 
 const getAllProducts = async (req, res) => {
-  let products = await Product.find({});
+  const { category } = req.query; // Get category from query parameters
+  let products;
+
+  if (category) {
+    products = await Product.find({ category });
+  } else {
+    products = await Product.find({});
+  }
+
   res.send(products);
 };
 
