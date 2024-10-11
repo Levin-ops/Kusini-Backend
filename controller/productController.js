@@ -51,16 +51,25 @@ const addProduct = async (req, res) => {
 };
 
 const getAllProducts = async (req, res) => {
-  const { category } = req.query; // Get category from query parameters
-  let products;
+  try {
+    const { category } = req.query; // Get category from query parameters
+    let products;
 
-  if (category) {
-    products = await Product.find({ category });
-  } else {
-    products = await Product.find({});
+    if (category) {
+      products = await Product.find({ category });
+    } else {
+      products = await Product.find({});
+    }
+
+    if (!products || products.length === 0) {
+      return res.status(404).json({ message: "No products found" });
+    }
+
+    res.json(products);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
-
-  res.send(products);
 };
 
 const toggleAvailability = async (req, res) => {
