@@ -51,23 +51,27 @@ const addProduct = async (req, res) => {
 };
 
 const getAllProducts = async (req, res) => {
+  let products = await Product.find({});
+  res.send(products);
+};
+
+const getRelatedProducts = async (req, res) => {
   try {
     const { category } = req.query; // Get category from query parameters
-    let products;
 
-    if (category) {
-      products = await Product.find({ category });
-    } else {
-      products = await Product.find({});
+    if (!category) {
+      return res.status(400).json({ message: "Category is required" });
     }
 
-    if (!products || products.length === 0) {
-      return res.status(404).json({ message: "No products found" });
+    const relatedProducts = await Product.find({ category });
+
+    if (!relatedProducts || relatedProducts.length === 0) {
+      return res.status(404).json({ message: "No related products found" });
     }
 
-    res.json(products);
+    res.json(relatedProducts); // Send related products as JSON response
   } catch (error) {
-    console.error("Error fetching products:", error);
+    console.error("Error fetching related products:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -114,6 +118,7 @@ const getSoftDrinks = async (req, res) => {
 module.exports = {
   addProduct,
   getAllProducts,
+  getRelatedProducts,
   toggleAvailability,
   deleteProduct,
   getTopShelf,

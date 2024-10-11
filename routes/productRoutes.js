@@ -1,5 +1,6 @@
 const express = require("express");
 const {
+  getRelatedProducts,
   addProduct,
   getAllProducts,
   toggleAvailability,
@@ -19,5 +20,6 @@ router.get("/allproducts", getAllProducts);
 router.get("/topshelf", getTopShelf);
 router.get("/populardrinks", getPopularDrinks);
 router.get("/softdrinks", getSoftDrinks);
+router.get("relatedproducts", getRelatedProducts);
 
 module.exports = router;
