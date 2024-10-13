@@ -5,6 +5,7 @@ const connectDB = require("./config/db");
 const productRoutes = require("./routes/productRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const orderRoutes = require("./routes/orderRoutes");
+const mpesaRoutes = require("./routes/mpesaRoutes");
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.get("/", (req, res) => {
 app.use("/admin", adminRoutes);
 app.use("/products", productRoutes);
 app.use("/orders", orderRoutes);
+app.use("/mpesa", mpesaRoutes);
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
