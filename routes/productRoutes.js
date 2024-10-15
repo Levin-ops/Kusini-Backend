@@ -8,6 +8,7 @@ const {
   getTopShelf,
   getPopularDrinks,
   getSoftDrinks,
+  getCustomerProducts,
 } = require("../controller/productController");
 const { upload } = require("../middleware/uploadMiddleware");
 
@@ -21,5 +22,6 @@ router.get("/topshelf", getTopShelf);
 router.get("/populardrinks", getPopularDrinks);
 router.get("/softdrinks", getSoftDrinks);
 router.get("relatedproducts", getRelatedProducts);
+router.get("/customerproducts", getCustomerProducts);
 
 module.exports = router;

@@ -1,4 +1,5 @@
 const axios = require("axios");
+const Orders = require("../models/Order");
 
 const getMpesaToken = async (req, res, next) => {
   try {
@@ -51,7 +52,7 @@ const stkPush = async (req, res) => {
         PartyA: `254${phone}`,
         PartyB: shortCode,
         PhoneNumber: `254${phone}`,
-        CallBackURL: "https://mydomain.com/pet",
+        CallBackURL: "https://bcd4-102-0-7-6.ngrok-free.app/mpesa/callback",
         AccountReference: "test",
         TransactionDesc: "Test Transaction",
       },
@@ -67,4 +68,47 @@ const stkPush = async (req, res) => {
   }
 };
 
-module.exports = { getMpesaToken, stkPush };
+const callback = async (req, res) => {
+  try {
+    const callbackData = req.body;
+
+    if (!callbackData.Body.stkCallBack.CallbackMetadata) {
+      const resultCode = callbackData.Body.stkCallback.resultCode;
+
+      if (resultCode === 1032) {
+        console.log("Transaction Cancelled by User");
+        return res.status(200).json({ message: "Transaction cancelled" });
+      }
+      console.log("Transaction Failed", callbackData.Body);
+      return res.status(200).json({ message: "Transaction failed" });
+    }
+
+    const metadata = callbackData.Body.stkCallBack.CallbackMetadata;
+    const phoneItem = metadata.Item.find((item) => item.Name === "phoneNumber");
+
+    if (!phoneItem) {
+      return res.status(400).json({ message: "phone number not found" });
+    }
+
+    const phoneNumber = phoneItem.value;
+
+    const order = await Orders.findOne({
+      "customer.phoneNumber": phoneNumber,
+      paymentMethod: "paynow",
+    });
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    order.paymentStatus = "PAID";
+    await order.save();
+    res.status(200).json({ message: "Payment successful" });
+  } catch (error) {
+    console.error("Callback error: ", error);
+    res
+      .status(500)
+      .json({ status: "error", messsage: "Error Processing Transaction" });
+  }
+};
+
+module.exports = { getMpesaToken, stkPush, callback };
