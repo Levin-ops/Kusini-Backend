@@ -1,40 +1,42 @@
 const { type } = require("express/lib/response");
 const mongoose = require("mongoose");
 
-const OrderSchema = new mongoose.Schema({
+const orderSchema = new mongoose.Schema({
   customer: {
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
-    phoneNumber: { type: String, required: true },
+    firstName: String,
+    lastName: String,
+    phoneNumber: String, // Make sure to capture the customer's phone number
   },
   items: [
     {
-      productId: { type: Number, required: true },
-      name: { type: String, required: true },
-      quantity: { type: Number, required: true },
-      price: { type: Number, required: true },
-      total: { type: Number, required: true },
+      productId: mongoose.Schema.Types.ObjectId,
+      name: String,
+      quantity: Number,
+      price: Number,
+      total: Number,
     },
   ],
   paymentMethod: {
     type: String,
     enum: ["cod", "mpesa", "paynow"],
-    required: true,
   },
   paymentStatus: {
     type: String,
-    enum: ["C.O.D", "M.O.D", "PAID"],
-    required: true,
+    enum: ["C.O.D", "M.O.D", "PAID", "PENDING"],
+    default: "PENDING",
   },
-  shippingFee: { type: Number, required: true },
-  location: { type: String, required: true },
-  totalAmount: { type: Number, required: true },
+  shippingFee: Number,
+  totalAmount: Number,
+  location: String,
   status: {
     type: String,
     enum: ["Pending", "Delivered", "Cancelled"],
     default: "Pending",
   },
-  createdAt: { type: Date, default: Date.now },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
-module.exports = mongoose.model("Order", OrderSchema);
+module.exports = mongoose.model("Order", orderSchema);

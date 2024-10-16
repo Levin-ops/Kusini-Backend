@@ -12,7 +12,7 @@ const createOrder = async (req, res) => {
     customer,
     items,
     paymentMethod,
-    paymentStatus: paymentMethod === "cod" ? "C.O.D" : "M.O.D", // Default status
+    paymentStatus: paymentMethod === "cod" ? "C.O.D" : "M.O.D",
     shippingFee,
     totalAmount,
     location,
@@ -76,4 +76,36 @@ const deleteOrder = async (req, res) => {
   }
 };
 
-module.exports = { createOrder, getAllOrders, updateOrderStatus, deleteOrder };
+const checkPaymentStatus = async (req, res) => {
+  const { phoneNumber } = req.query;
+
+  if (!phoneNumber) {
+    return res.status(400).json({ message: "Phone number is required." });
+  }
+
+  try {
+    const order = await Order.findOne({ "customer.phoneNumber": phoneNumber })
+      .sort({ createdAt: -1 }) // Get the latest order by this phone number
+      .exec();
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found." });
+    }
+
+    res.json({
+      success: true,
+      paymentStatus: order.paymentStatus,
+    });
+  } catch (error) {
+    console.error("Error checking payment status:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = {
+  createOrder,
+  checkPaymentStatus,
+  getAllOrders,
+  updateOrderStatus,
+  deleteOrder,
+};

@@ -52,16 +52,28 @@ const stkPush = async (req, res) => {
         PartyA: `254${phone}`,
         PartyB: shortCode,
         PhoneNumber: `254${phone}`,
-        CallBackURL: "https://bcd4-102-0-7-6.ngrok-free.app/mpesa/callback",
-        AccountReference: "test",
-        TransactionDesc: "Test Transaction",
+        CallBackURL: `${process.env.CALLBACK_URI}/mpesa/callback`,
+        AccountReference: "OrderPayment",
+        TransactionDesc: "Payment for Order",
       },
       {
         headers: { Authorization: auth },
       }
     );
 
-    res.status(200).json(response.data);
+    if (response.data.ResponseCode === "0") {
+      res.status(200).json({
+        success: true,
+        message: "STK push initiated",
+        data: response.data,
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: "STK push failed",
+        data: response.data,
+      });
+    }
   } catch (error) {
     console.error("STK push error: ", error);
     res.status(500).json({ error: "Failed to process STK push" });
@@ -72,25 +84,30 @@ const callback = async (req, res) => {
   try {
     const callbackData = req.body;
 
-    if (!callbackData.Body.stkCallBack.CallbackMetadata) {
-      const resultCode = callbackData.Body.stkCallback.resultCode;
-
+    // Check if there's no CallbackMetadata
+    if (!callbackData.Body.stkCallback.CallbackMetadata) {
+      const resultCode = callbackData.Body.stkCallback.ResultCode;
       if (resultCode === 1032) {
         console.log("Transaction Cancelled by User");
         return res.status(200).json({ message: "Transaction cancelled" });
       }
       console.log("Transaction Failed", callbackData.Body);
-      return res.status(200).json({ message: "Transaction failed" });
+      return res
+        .status(200)
+        .json({ message: "Transaction failed", resultCode });
     }
 
-    const metadata = callbackData.Body.stkCallBack.CallbackMetadata;
-    const phoneItem = metadata.Item.find((item) => item.Name === "phoneNumber");
+    // Extract Metadata from successful payment
+    const metadata = callbackData.Body.stkCallback.CallbackMetadata;
+    const phoneItem = metadata.Item.find((item) => item.Name === "PhoneNumber");
 
     if (!phoneItem) {
-      return res.status(400).json({ message: "phone number not found" });
+      return res
+        .status(400)
+        .json({ message: "Phone number not found in the transaction" });
     }
 
-    const phoneNumber = phoneItem.value;
+    const phoneNumber = phoneItem.Value;
 
     const order = await Orders.findOne({
       "customer.phoneNumber": phoneNumber,
@@ -98,16 +115,18 @@ const callback = async (req, res) => {
     });
 
     if (!order) {
-      return res.status(404).json({ message: "Order not found" });
+      return res
+        .status(404)
+        .json({ message: "Order not found for this phone number" });
     }
+
     order.paymentStatus = "PAID";
     await order.save();
-    res.status(200).json({ message: "Payment successful" });
+
+    res.status(200).json({ message: "Payment successful, order updated" });
   } catch (error) {
     console.error("Callback error: ", error);
-    res
-      .status(500)
-      .json({ status: "error", messsage: "Error Processing Transaction" });
+    res.status(500).json({ error: "Error processing transaction" });
   }
 };
 
