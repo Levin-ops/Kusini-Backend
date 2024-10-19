@@ -97,7 +97,7 @@ const callback = async (req, res) => {
         .json({ message: "Transaction failed", resultCode });
     }
 
-    // Extract Metadata from successful payment
+    // Extracting Metadata from successful payment
     const metadata = callbackData.Body.stkCallback.CallbackMetadata;
     const phoneItem = metadata.Item.find((item) => item.Name === "PhoneNumber");
 
