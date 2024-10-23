@@ -1,4 +1,5 @@
 const Order = require("../models/Order");
+const { emitNewOrder } = require("../socket");
 
 const createOrder = async (req, res) => {
   const { customer, items, paymentMethod, shippingFee, totalAmount, location } =
@@ -20,6 +21,9 @@ const createOrder = async (req, res) => {
 
   try {
     const savedOrder = await newOrder.save();
+
+    emitNewOrder();
+
     res.status(201).json({
       success: true,
       order: savedOrder,

@@ -6,6 +6,8 @@ const productRoutes = require("./routes/productRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const mpesaRoutes = require("./routes/mpesaRoutes");
+const http = require("http");
+const { initSocket } = require("./socket");
 
 dotenv.config();
 
@@ -25,6 +27,9 @@ app.use("/admin", adminRoutes);
 app.use("/products", productRoutes);
 app.use("/orders", orderRoutes);
 app.use("/mpesa", mpesaRoutes);
+
+const server = http.createServer(app);
+initSocket(server);
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
