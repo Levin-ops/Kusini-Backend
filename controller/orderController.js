@@ -1,5 +1,9 @@
 const Order = require("../models/Order");
 const { emitNewOrder } = require("../socket");
+// const twilio = require("twilio");
+// const accountSid = process.env.TWILIO_ACCOUNT_SID;
+// const authToken = process.env.TWILIO_AUTH_TOKEN;
+// const client = new twilio(accountSid, authToken);
 
 const createOrder = async (req, res) => {
   const { customer, items, paymentMethod, shippingFee, totalAmount, location } =
@@ -57,6 +61,19 @@ const updateOrderStatus = async (req, res) => {
     if (!updatedOrder) {
       return res.status(404).json({ message: "Order not found" });
     }
+
+    // // twilio
+    // const twilio_number = "+19165426990";
+    // if (newStatus === "Delivered") {
+    //   client.messages
+    //     .create({
+    //       body: `Hello ${updatedOrder.customer.firstName},  your order has been delivered. Thank You for shopping at Kusini Liquor`,
+    //       to: `+254${updatedOrder.customer.phoneNumber.slice(1)}`,
+    //       from: twilio_number,
+    //     })
+    //     .then((message) => console.log(`sms sent: ${messages.sid}`))
+    //     .catch((err) => console.error("failed to send sms:", err));
+    // }
 
     res.json({
       success: true,
