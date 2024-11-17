@@ -115,19 +115,19 @@ const deleteProduct = async (req, res) => {
 
 const getTopShelf = async (req, res) => {
   let products = await Product.find({ level: "Top Shelf" });
-  let topShelf = products.slice(0, 10);
+  let topShelf = products.slice(0, 14);
   res.send(topShelf);
 };
 
 const getPopularDrinks = async (req, res) => {
   let products = await Product.find({ level: "Standard" });
-  let popularDrinks = products.slice(0, 10);
+  let popularDrinks = products.slice(0, 14);
   res.send(popularDrinks);
 };
 
 const getSoftDrinks = async (req, res) => {
   let products = await Product.find({ category: "soft-drink" });
-  let softDrinks = products.slice(0, 5);
+  let softDrinks = products.slice(0, 8);
   res.send(softDrinks);
 };
 
