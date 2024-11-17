@@ -1,10 +1,7 @@
----
-
 # **Kusini Backend**
 
 **A robust backend solution for managing an ecommerce platform with seamless payment integration, media management, and scalable data storage.**
 
----
 
 ## **Table of Contents**
 
@@ -38,7 +35,7 @@ This **Kusini Backend** powers Kusini Liquor ecommerce platform. It integrates p
 - **MPESA**: Payment gateway for secure transactions.
 - **Cloudinary**: Service for media file storage and management.
 
----
+
 
 ## **Environment Variables**
 
@@ -64,7 +61,7 @@ The application requires specific environment variables defined in a `.env` file
 - `CALLBACK_URI`
 - `MONGO_URI`
 
----
+
 
 ## **Setup Instructions**
 
@@ -76,7 +73,7 @@ Ensure you have the following installed:
 - MongoDB (cloud or local setup)
 - Cloudinary account
 
----
+
 
 ### **Installation**
 
@@ -107,7 +104,7 @@ Ensure you have the following installed:
    npm test
    ```
 
----
+
 
 ## **API Endpoints**
 
@@ -134,7 +131,7 @@ Ensure you have the following installed:
 - `GET /api/users`
   - **Description**: Retrieves a list of all users.
 
----
+
 
 ## **Error Handling**
 
@@ -145,15 +142,15 @@ The application implements centralized error handling with meaningful status cod
 - **404**: Not Found (Resource unavailable).
 - **500**: Internal Server Error (Unexpected errors).
 
----
+
 
 ## **Security Best Practices**
 
-1. **Secure Environment Variables**: Ensure `.env` is not exposed.
+1. **Secure Environment Variables**:  `.env` is not exposed.
 2. **Uses HTTPS**: Protect data during transmission.
 3. **Dependency Updates**: Packages regularly updated to avoid vulnerabilities.
 
----
+
 
 ## **Deployment**
 
@@ -164,9 +161,9 @@ The application is deployed using **Render**. Follow these steps for deployment:
 3. Link your repository to Render and deploy your app.
 4. Test your endpoints to ensure functionality.
 
----
 
----
+
+
 
 ## **Contributing**
 
@@ -189,12 +186,12 @@ I welcome contributions to enhance **Kusini Backend**.
    ```
 5. **Open a Pull Request**: Clearly describe your changes and why they should be merged.
 
----
+
 
 ## **License**
 
 This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
 
----
+
 
 **Happy Coding!** 🚀
